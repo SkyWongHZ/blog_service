@@ -170,5 +170,5 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 }
 
 func (l *Logger) Errorf(ctx context.Context, format string, v ...interface{}) {
-	l.WithContext(ctx).WithTrace().Output(LevelError, fmt.Sprintf(format, v...))
+	l.WithContext(ctx).Output(LevelError, fmt.Sprintf(format, v...))
 }

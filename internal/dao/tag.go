@@ -23,8 +23,6 @@ func (d *Dao) CreateTag(name string, state uint8, createdBy string) error {
 		Model: &model.Model{CreatedBy: createdBy},
 	}
 
-	
-
 	return tag.Create(d.engine)
 }
 
