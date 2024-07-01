@@ -20,7 +20,7 @@ Database:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
-  JWT:
+JWT:
   Secret: Sky
   Issuer: blog-service
   Expire: 7200
