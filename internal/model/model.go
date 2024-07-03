@@ -25,8 +25,9 @@ type Model struct {
 	IsDel      uint8  `json:"is_del",omitempty`
 }
 
-func NewDBEgine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
+func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	s := "%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local"
+	fmt.Println("s", s)
 	db, err := gorm.Open(databaseSetting.DBType, fmt.Sprintf(s,
 		databaseSetting.UserName,
 		databaseSetting.Password,

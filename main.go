@@ -33,6 +33,7 @@ func init() {
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
 	router := routers.NewRouter()
+	fmt.Println("global.AppSetting", global.AppSetting)
 	s := &http.Server{
 		Addr:           ":" + global.ServerSetting.HttpPort,
 		Handler:        router,
@@ -41,12 +42,8 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	s.ListenAndServe()
+	global.Logger.Infof("%s: go-programming-tour-book/%s", "eddycjy", "blog-service")
 
-	// r := gin.Default()
-	// r.GET("ping", func(ctx *gin.Context) {
-	// 	ctx.JSON(200, gin.H{"message": "pong"})
-	// })
-	// r.Run()
 }
 
 func setupSetting() error {
@@ -93,7 +90,7 @@ func setupLogger() error {
 
 func setupDBEngine() error {
 	var err error
-	global.DBEngine, err = model.NewDBEgine(global.DatabaseSetting)
+	global.DBEngine, err = model.NewDBEngine(global.DatabaseSetting)
 	if err != nil {
 		return err
 	}
