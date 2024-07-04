@@ -31,6 +31,10 @@ func init() {
 }
 
 func main() {
+	a := 1
+	b := a + 1
+	fmt.Println("b", b)
+
 	gin.SetMode(global.ServerSetting.RunMode)
 	router := routers.NewRouter()
 	fmt.Println("global.AppSetting", global.AppSetting)
@@ -42,7 +46,6 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	s.ListenAndServe()
-	global.Logger.Infof("%s: go-programming-tour-book/%s", "eddycjy", "blog-service")
 
 }
 
