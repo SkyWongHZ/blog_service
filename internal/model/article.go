@@ -1,6 +1,10 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import (
+	"fmt"
+
+	"github.com/jinzhu/gorm"
+)
 
 type Article struct {
 	*Model
@@ -60,8 +64,10 @@ type ArticleRow struct {
 	Content       string
 }
 
+// 根据标签id获取文章列表
 func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int) ([]*ArticleRow, error) {
 	fields := []string{"ar.id AS article_id", "ar.title AS article_title", "ar.desc AS article_desc", "ar.cover_image_url", "ar.content"}
+	fmt.Println("fields", fields)
 	fields = append(fields, []string{"t.id AS tag_id", "t.name AS tag_name"}...)
 
 	if pageOffset >= 0 && pageSize > 0 {
@@ -72,6 +78,8 @@ func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int
 		Joins("LEFT JOIN `"+Article{}.TableName()+"` AS ar ON at.article_id = ar.id").
 		Where("at.`tag_id` = ? AND ar.state = ? AND ar.is_del = ?", tagID, a.State, 0).
 		Rows()
+
+		// 结果处理
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +98,7 @@ func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int
 	return articles, nil
 }
 
+// 根据标签id获取文章数量
 func (a Article) CountByTagID(db *gorm.DB, tagID uint32) (int, error) {
 	var count int
 	err := db.Table(ArticleTag{}.TableName()+" AS at").

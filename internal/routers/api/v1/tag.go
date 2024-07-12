@@ -47,6 +47,9 @@ func (t Tag) List(c *gin.Context) {
 	return
 }
 
+// 函数定义和参数解析
+// 创建tag服务并调用
+// 返回成功响应
 func (t Tag) Create(c *gin.Context) {
 	param := service.CreateTagRequest{}
 	response := app.NewResponse(c)
@@ -92,6 +95,7 @@ func (t Tag) Update(c *gin.Context) {
 }
 
 func (t Tag) Delete(c *gin.Context) {
+
 	param := service.DeleteTagRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &param)
@@ -112,3 +116,5 @@ func (t Tag) Delete(c *gin.Context) {
 	response.ToResponse(gin.H{})
 	return
 }
+
+
