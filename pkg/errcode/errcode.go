@@ -6,7 +6,7 @@ import (
 )
 
 type Error struct {
-	code    int      `json:"cocde"`
+	code    int      `json:"code"`
 	msg     string   `json:"msg"`
 	details []string `json:"details"`
 }
@@ -42,6 +42,7 @@ func (e *Error) Details() []string {
 }
 
 func (e *Error) WithDetails(details ...string) *Error {
+	// 创建一个新的 Error 对象 newError，它是对 e 的值的拷贝,这一步实际上是进行值拷贝，而不是指针拷贝
 	newError := *e
 	newError.details = []string{}
 	for _, d := range details {
