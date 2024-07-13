@@ -56,7 +56,7 @@ func (t User) Create(c *gin.Context) {
 
 	svc := service.New(c.Request.Context())
 
-	err := svc.RegisterUser(c.Request.Context(), &param)
+	err := svc.RegisterUser(&param)
 	if err != nil {
 		global.Logger.Errorf(c, "svc.RegisterUser err: %v", err)
 		response.ToErrorResponse(errcode.ErrorRegisterUserFail)

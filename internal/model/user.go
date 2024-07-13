@@ -1,9 +1,6 @@
 package model
 
 import (
-	"context"
-
-	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/jinzhu/gorm"
 )
 
@@ -53,10 +50,6 @@ func (u User) List(db *gorm.DB, pageOffset, pageSize int) ([]*User, error) {
 
 }
 
-func (u User) Create(ctx context.Context, db *gorm.DB) error {
-	if err := db.Create(&u).Error; err != nil {
-		global.Logger.Errorf(ctx, "user.model.Create: %v", err)
-		return err
-	}
-	return nil
+func (u User) Create(db *gorm.DB) error {
+	return db.Create(&u).Error
 }

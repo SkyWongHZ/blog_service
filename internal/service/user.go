@@ -1,9 +1,6 @@
 package service
 
 import (
-	"context"
-
-	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
 )
@@ -35,10 +32,6 @@ func (svc *Service) ListUser(param *ListUserRequest, pager *app.Pager) ([]*model
 	return svc.dao.ListUser(param.Username, param.Email, param.State, pager.Page, pager.PageSize)
 }
 
-func (svc *Service) RegisterUser(ctx context.Context, param *RegisterUserRequest) error {
-	if err := svc.dao.RegisterUser(ctx, param.Username, param.Email, param.Password, param.State); err != nil {
-		global.Logger.Errorf(ctx, "user.service.RegisterUser: %v", err)
-		return err
-	}
-	return nil
+func (svc *Service) RegisterUser(param *RegisterUserRequest) error {
+	return svc.dao.RegisterUser(param.Username, param.Email, param.Password, param.State)
 }
