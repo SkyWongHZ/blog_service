@@ -12,4 +12,8 @@ var (
 	ErrorCreateArticleFail = NewError(20020003, "创建文章失败")
 	ErrorUpdateArticleFail = NewError(20020004, "更新文章失败")
 	ErrorDeleteArticleFail = NewError(20020005, "删除文章失败")
+
+	ErrorListUserFail = NewError(20030001, "获取用户列表失败")
+	ErrorRegisterUserFail = NewError(20030002, "创建用户列表失败")
+	ErrorCountUserFail=NewError(20030003,"统计用户总数失败")
 )

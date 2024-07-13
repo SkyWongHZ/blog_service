@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -67,7 +65,6 @@ type ArticleRow struct {
 // 根据标签id获取文章列表
 func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int) ([]*ArticleRow, error) {
 	fields := []string{"ar.id AS article_id", "ar.title AS article_title", "ar.desc AS article_desc", "ar.cover_image_url", "ar.content"}
-	fmt.Println("fields", fields)
 	fields = append(fields, []string{"t.id AS tag_id", "t.name AS tag_name"}...)
 
 	if pageOffset >= 0 && pageSize > 0 {

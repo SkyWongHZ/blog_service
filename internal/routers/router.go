@@ -2,7 +2,6 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-programming-tour-book/blog-service/internal/middleware"
 	"github.com/go-programming-tour-book/blog-service/internal/routers/api"
 	v1 "github.com/go-programming-tour-book/blog-service/internal/routers/api/v1"
 )
@@ -14,10 +13,11 @@ func NewRouter() *gin.Engine {
 
 	article := v1.NewArticle()
 	tag := v1.NewTag()
+	user := v1.NewUser()
 	r.POST("auth", api.GetAuth)
 	apiv1 := r.Group("/api/v1")
 	// JWT中间件使用
-	apiv1.Use(middleware.JWT())
+	// apiv1.Use(middleware.JWT())
 	{
 
 		apiv1.POST("/tags", tag.Create)
@@ -32,6 +32,10 @@ func NewRouter() *gin.Engine {
 		apiv1.PATCH("/articles/:id/state", article.Update)
 		apiv1.GET("/articles/:id", article.Get)
 		apiv1.GET("/articles", article.List)
+
+		apiv1.GET("/user", user.List)
+		apiv1.POST("/user", user.Create)
+
 	}
 
 	return r
