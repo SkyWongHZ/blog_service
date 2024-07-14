@@ -10,6 +10,7 @@ type User struct {
 	Password string `json:"password"`
 	Email    string `json:"email"`
 	State    uint8  `json:"state"`
+	
 }
 
 func (u User) TableName() string {
@@ -52,4 +53,18 @@ func (u User) List(db *gorm.DB, pageOffset, pageSize int) ([]*User, error) {
 
 func (u User) Create(db *gorm.DB) error {
 	return db.Create(&u).Error
+}
+
+func (u User) Update(db *gorm.DB, values interface{}) error {
+	if err := db.Model(&u).Updates(values).Where("id = ? AND is_del = ?", u.ID, 0).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+
+func (u User) Delete(db *gorm.DB) error {
+	return db.Where("id = ? AND is_del = ?", u.Model.ID, 0).Delete(&u).Error
 }

@@ -20,3 +20,25 @@ func (d *Dao) RegisterUser(username string, email string, password string, state
 	user := model.User{Username: username, Password: password, Email: email, State: state}
 	return user.Create(d.engine)
 }
+
+func (d *Dao) UpdateUser(id uint32, username string, state uint8, modifiedBy string) error {
+
+	user := model.User{
+		Model: &model.Model{ID: id},
+	}
+	values := map[string]interface{}{
+		"id":          id,
+		"state":       state,
+		"modified_by": modifiedBy,
+	}
+	if username != "" {
+		values["username"] = username
+	}
+
+	return user.Update(d.engine, values)
+}
+
+func (d *Dao) DeleteUser(id uint32) error {
+	user := model.User{Model: &model.Model{ID: id}}
+	return user.Delete(d.engine)
+}

@@ -91,7 +91,7 @@ func (t Tag) Update(c *gin.Context) {
 	}
 
 	response.ToResponse(gin.H{})
-	return
+	return 
 }
 
 func (t Tag) Delete(c *gin.Context) {
@@ -116,5 +116,3 @@ func (t Tag) Delete(c *gin.Context) {
 	response.ToResponse(gin.H{})
 	return
 }
-
-

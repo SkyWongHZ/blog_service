@@ -5,6 +5,7 @@ import (
 	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/service"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
+	"github.com/go-programming-tour-book/blog-service/pkg/convert"
 	"github.com/go-programming-tour-book/blog-service/pkg/errcode"
 )
 
@@ -64,5 +65,49 @@ func (t User) Create(c *gin.Context) {
 	}
 
 	response.ToResponse(gin.H{"新增接口成功": "200"})
+	return
+}
+
+func (t User) Update(c *gin.Context) {
+	param := service.UpdateUserRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	svc := service.New(c.Request.Context())
+	err := svc.UpdateUser(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.UpdateUser err: %v", err)
+		response.ToErrorResponse(errcode.ErrorUpdateUserFail)
+		return
+	}
+
+	response.ToResponse(gin.H{"更新成功": "200"})
+	return
+}
+
+func (t User) Delete(c *gin.Context) {
+	param := service.DeleteUserRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	svc := service.New(c.Request.Context())
+	err := svc.DeleteUser(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.DeleteUser err: %v", err)
+		response.ToErrorResponse(errcode.ErrorDeleteUserFail)
+		return
+	}
+
+	response.ToResponse(gin.H{"删除成功": "200"})
 	return
 }

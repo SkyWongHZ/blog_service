@@ -35,6 +35,8 @@ func NewRouter() *gin.Engine {
 
 		apiv1.GET("/user", user.List)
 		apiv1.POST("/user", user.Create)
+		apiv1.PUT("/user/:id", user.Update)
+		apiv1.DELETE("/user/:id", tag.Delete)
 
 	}
 
