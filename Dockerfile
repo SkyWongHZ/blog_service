@@ -43,13 +43,14 @@ COPY configs /root/configs
 
 # 安装必要的 ca-certificates
 # RUN apk update && apk add --no-cache ca-certificates
-RUN apk add --no-cache ca-certificates
+# RUN apk add --no-cache ca-certificates
 
 # 设置工作目录
 WORKDIR /root/
 
 # 从 builder 镜像复制构建的二进制文件
 COPY --from=builder /app/main .
+COPY configs/config.yaml /root/config.yaml
 
 # 确保二进制文件可执行
 RUN chmod +x ./main
