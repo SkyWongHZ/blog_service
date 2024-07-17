@@ -27,7 +27,6 @@ type Model struct {
 
 func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {
 	s := "%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local"
-	fmt.Println("s", s)
 	db, err := gorm.Open(databaseSetting.DBType, fmt.Sprintf(s,
 		databaseSetting.UserName,
 		databaseSetting.Password,
