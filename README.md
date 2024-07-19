@@ -8,8 +8,16 @@
 * 用户名去重逻辑((用户user,文章article,标签Tag都有类似问题))
 
 ### 整个系统
-* 部署到云服务器,上nginx和docker
+* ~~部署到云服务器,上nginx和docker~~
 * 修改日志为zap
 * 本地yaml配置和远程服务器配置支持
+* 建自动化流水线  CI/CD(docker  compose或直接挂载)
+* 写脚本deploy.sh支持自动化部署
+* yaml支持远程和本地数据库配置
+* API网关  
+* 鉴权服务   
+
+
+
  
 
