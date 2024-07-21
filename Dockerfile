@@ -1,6 +1,6 @@
 
 
-# 使用官方 Golang 1.22.5镜像作为基础镜像
+# 使用1.21镜像作为基础镜像
 FROM hub.atomgit.com/amd64/golang:1.21 as builder
 
 

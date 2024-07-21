@@ -21,7 +21,7 @@ type RegisterUserRequest struct {
 	Username string `form:"username" binding:"max=100"`
 	Email    string `form:"email" binding:"max=255"`
 	State    uint8  `form:"state,default=1" binding:"oneof=0 1"`
-	Password string `form:"password" binding:"max=255"`
+	Password string `form:"password" binding:"max=255,min=6"`
 }
 
 type UpdateUserRequest struct {
@@ -32,10 +32,8 @@ type UpdateUserRequest struct {
 }
 
 type DeleteUserRequest struct {
-	ID         uint32 `form:"id" binding:"required,gte=1"`
+	ID uint32 `form:"id" binding:"required,gte=1"`
 }
-
-
 
 func (svc *Service) CountUser(param *CountUserRequest) (int, error) {
 	return svc.dao.CountUser(param.Username, param.Email, param.State)
