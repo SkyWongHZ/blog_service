@@ -17,6 +17,9 @@
 * API网关  
 * 鉴权服务   
 
+启动命令  
+go run  main.go
+
 
 
  

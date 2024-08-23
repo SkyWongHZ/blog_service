@@ -67,7 +67,7 @@ CREATE TABLE `blog_user` (
   `is_del` tinyint(3) unsigned DEFAULT '0' COMMENT '是否删除 0为未删除、1为已删除',
   `state` tinyint(3) unsigned DEFAULT '1' COMMENT '状态 0为禁用、1为启用',
   PRIMARY KEY (`id`),
-  UNIQUE  KEY'username' (`username`),
-  UNIQUE KEY'email' ('email')
+  UNIQUE  KEY (`username`),
+  UNIQUE KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户';
 
