@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"strings"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
@@ -13,23 +15,27 @@ func JWT() gin.HandlerFunc {
 			token string
 			ecode = errcode.Success
 		)
-		if s, exist := c.GetQuery("token"); exist {
-			token = s
-		} else {
-			token = c.GetHeader("token")
-		}
-		if token == "" {
+		authHeader := c.GetHeader("token")
+		if authHeader == "" {
 			ecode = errcode.InvalidParams
 		} else {
-			_, err := app.ParseToken(token)
-			if err != nil {
-				switch err.(*jwt.ValidationError).Errors {
-				case jwt.ValidationErrorExpired:
-					ecode = errcode.UnauthorizedTokenTimeout
-				default:
-					ecode = errcode.UnauthorizedTokenError
+			// 预期格式为 "Bearer <token>"
+			parts := strings.SplitN(authHeader, " ", 2)
+			if len(parts) != 2 || parts[0] != "Bearer" {
+				ecode = errcode.InvalidParams
+			} else {
+				token = parts[1]
+				_, err := app.ParseToken(token)
+				if err != nil {
+					switch err.(*jwt.ValidationError).Errors {
+					case jwt.ValidationErrorExpired:
+						ecode = errcode.UnauthorizedTokenTimeout
+					default:
+						ecode = errcode.UnauthorizedTokenError
+					}
 				}
 			}
+
 		}
 
 		if ecode != errcode.Success {

@@ -13,8 +13,8 @@ Database:
   DBType: mysql
   Username: root  # 填写你的数据库账号
   Password: 123456  # 填写你的数据库密码
-  Host: 118.178.184.13:3306 
-  # Host: my-mysql:3306 
+  # Host: 118.178.184.13:3306 
+  Host: 127.0.0.1:3306 
   DBName: blog_service
   TablePrefix: blog_
   Charset: utf8

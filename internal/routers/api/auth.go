@@ -7,7 +7,15 @@ import (
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
 	"github.com/go-programming-tour-book/blog-service/pkg/errcode"
 )
-
+// @Summary 获取授权Token
+// @Produce json
+// @Param app_key query string true "应用关键字"
+// @Param app_secret query string true "应用密钥"
+// @Success 200 {object} map[string]interface{} "成功返回Token"
+// @Failure 400 {object} errcode.Error "请求参数错误"
+// @Failure 401 {object} errcode.Error "授权失败"
+// @Failure 500 {object} errcode.Error "内部错误"
+// @Router /auth [post]
 func GetAuth(c *gin.Context) {
 	param := service.AuthRequest{}
 	response := app.NewResponse(c)
