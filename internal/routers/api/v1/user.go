@@ -15,6 +15,17 @@ func NewUser() User {
 	return User{}
 }
 
+// @Summary 用户列表
+// @Produce json
+// @Param username query string false "用户名"
+// @Param email query string false "邮箱"
+// @Param state query int false "状态"
+// @Param page query int false "页码"
+// @Param page_size query int false "每页显示数量"
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {array} User "用户列表"
+// @Failure 400 {object} errcode.Error "请求参数错误"
+// @Router /api/v1/user [get]
 func (t User) List(c *gin.Context) {
 	param := service.ListUserRequest{}
 	response := app.NewResponse(c)
@@ -45,6 +56,16 @@ func (t User) List(c *gin.Context) {
 	return
 }
 
+// @Summary 创建用户
+// @Produce json
+// @Param username body string true "用户名"
+// @Param email body string true "邮箱"
+// @Param password body string true "密码"
+// @Param state body int false "状态"
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]interface{} "用户创建成功"
+// @Failure 400 {object} errcode.Error "请求参数错误"
+// @Router /api/v1/user [post]
 func (t User) Create(c *gin.Context) {
 	param := service.RegisterUserRequest{}
 	response := app.NewResponse(c)
@@ -68,6 +89,16 @@ func (t User) Create(c *gin.Context) {
 	return
 }
 
+// @Summary 更新用户
+// @Produce json
+// @Param id path int true "用户ID"
+// @Param username body string false "用户名"
+// @Param email body string false "邮箱"
+// @Param state body int false "状态"
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]interface{} "用户更新成功"
+// @Failure 400 {object} errcode.Error "请求参数错误"
+// @Router /api/v1/user/{id} [put]
 func (t User) Update(c *gin.Context) {
 	param := service.UpdateUserRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)
@@ -90,6 +121,13 @@ func (t User) Update(c *gin.Context) {
 	return
 }
 
+// @Summary 删除用户
+// @Produce json
+// @Param id path int true "用户ID"
+// @Param Authorization header string true "Bearer Token"
+// @Success 200 {object} map[string]interface{} "用户删除成功"
+// @Failure 400 {object} errcode.Error "请求参数错误"
+// @Router /api/v1/user/{id} [delete]
 func (t User) Delete(c *gin.Context) {
 	param := service.DeleteUserRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
 	response := app.NewResponse(c)

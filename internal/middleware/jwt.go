@@ -15,7 +15,7 @@ func JWT() gin.HandlerFunc {
 			token string
 			ecode = errcode.Success
 		)
-		authHeader := c.GetHeader("token")
+		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			ecode = errcode.InvalidParams
 		} else {
