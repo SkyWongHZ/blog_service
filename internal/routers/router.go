@@ -17,8 +17,7 @@ func NewRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	// 设置 Swagger文档地址
-	// url := ginSwagger.URL("http://127.0.0.1:8080/swagger/doc.json")
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler,))
 
 	article := v1.NewArticle()
 	tag := v1.NewTag()
