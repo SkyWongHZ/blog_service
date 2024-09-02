@@ -21,6 +21,9 @@
 * API网关  
 * 鉴权服务   
 
+swagger地址
+http://118.178.184.13:8080/swagger/index.html
+
 
 
 

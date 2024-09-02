@@ -34,13 +34,8 @@ func init() {
 // @version 1.0
 // @description 用go搭建的博客系统
 func main() {
-	a := 1
-	b := a + 1
-	fmt.Println("b", b)
-
 	gin.SetMode(global.ServerSetting.RunMode)
 	router := routers.NewRouter()
-	fmt.Println("global.AppSetting", global.AppSetting)
 	s := &http.Server{
 		Addr:           ":" + global.ServerSetting.HttpPort,
 		Handler:        router,

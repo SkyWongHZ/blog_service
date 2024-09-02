@@ -1,6 +1,9 @@
 package routers
 
 import (
+	"time"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/internal/middleware"
 	"github.com/go-programming-tour-book/blog-service/internal/routers/api"
@@ -16,8 +19,11 @@ func NewRouter() *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
+	// 添加 CORS 中间件
+	r.Use(cors.New(corsConfig()))
+
 	// 设置 Swagger文档地址
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler,))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	article := v1.NewArticle()
 	tag := v1.NewTag()
@@ -49,4 +55,16 @@ func NewRouter() *gin.Engine {
 	}
 
 	return r
+}
+
+// CORS 中间件
+func corsConfig() cors.Config {
+	return cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}
 }
