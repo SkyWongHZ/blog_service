@@ -79,13 +79,20 @@ func (t User) Create(c *gin.Context) {
 	svc := service.New(c.Request.Context())
 
 	err := svc.RegisterUser(&param)
+
 	if err != nil {
 		global.Logger.Errorf(c, "svc.RegisterUser err: %v", err)
-		response.ToErrorResponse(errcode.ErrorRegisterUserFail)
-		return
+
+		if err.Error() == "username already exists" {
+			response.ToErrorResponse(errcode.NewError(20010001, "用户名已存在"))
+
+			response.ToErrorResponse(errcode.ErrorRegisterUserFail)
+			return
+		} else {
+			response.ToResponse(gin.H{"新增接口成功": "200"})
+		}
 	}
 
-	response.ToResponse(gin.H{"新增接口成功": "200"})
 	return
 }
 
@@ -145,7 +152,6 @@ func (t User) Delete(c *gin.Context) {
 		response.ToErrorResponse(errcode.ErrorDeleteUserFail)
 		return
 	}
-
 	response.ToResponse(gin.H{"删除成功": "200"})
 	return
 }

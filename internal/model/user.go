@@ -1,20 +1,30 @@
 package model
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 )
 
+var ErrUsernameAlreadyExists = errors.New("username already exists")
+
 type User struct {
 	*Model
-	Username string `json:"username"`
+	Username string `json:"username" gorm:"uniqueIndex;not null"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
 	State    uint8  `json:"state"`
-	
 }
 
 func (u User) TableName() string {
 	return "blog_user"
+}
+
+// 添加检查用户名是否存在的方法
+func (u User) IsUsernameExist(db *gorm.DB, username string) (bool, error) {
+	var count int64
+	err := db.Model(&User{}).Where("username = ?", username).Count(&count).Error
+	return count > 0, err
 }
 
 func (u User) Count(db *gorm.DB) (int, error) {
@@ -52,6 +62,15 @@ func (u User) List(db *gorm.DB, pageOffset, pageSize int) ([]*User, error) {
 }
 
 func (u User) Create(db *gorm.DB) error {
+	exist, err := u.IsUsernameExist(db, u.Username)
+	if err != nil {
+		return err
+
+	}
+	if exist {
+		return ErrUsernameAlreadyExists
+	}
+
 	return db.Create(&u).Error
 }
 
@@ -62,8 +81,6 @@ func (u User) Update(db *gorm.DB, values interface{}) error {
 
 	return nil
 }
-
-
 
 func (u User) Delete(db *gorm.DB) error {
 	return db.Where("id = ? AND is_del = ?", u.Model.ID, 0).Delete(&u).Error

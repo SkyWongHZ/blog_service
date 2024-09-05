@@ -1,8 +1,11 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
+	"github.com/jinzhu/gorm"
 )
 
 type CountUserRequest struct {
@@ -44,7 +47,16 @@ func (svc *Service) ListUser(param *ListUserRequest, pager *app.Pager) ([]*model
 }
 
 func (svc *Service) RegisterUser(param *RegisterUserRequest) error {
-	return svc.dao.RegisterUser(param.Username, param.Email, param.Password, param.State)
+	// return svc.dao.RegisterUser(param.Username, param.Email, param.Password, param.State)
+	err := svc.dao.RegisterUser(param.Username, param.Email, param.Password, param.State)
+	if err != nil {
+		// 检查是否是唯一性约束违反错误
+		if gorm.IsRecordNotFoundError(err) {
+			return errors.New("username already exists")
+		}
+		return err
+	}
+	return nil
 }
 
 func (svc *Service) UpdateUser(param *UpdateUserRequest) error {
