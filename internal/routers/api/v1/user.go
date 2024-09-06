@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/service"
@@ -80,20 +82,33 @@ func (t User) Create(c *gin.Context) {
 
 	err := svc.RegisterUser(&param)
 
+	// if err != nil {
+	// 	global.Logger.Errorf(c, "svc.RegisterUser err: %v", err)
+	// 	fmt.Println("router", err)
+	// 	if err.Error() == "username already exists" {
+	// 		response.ToErrorResponse(errcode.NewError(20010001, "用户名已存在"))
+	// 	} else {
+	// 		response.ToErrorResponse(errcode.ErrorRegisterUserFail)
+	// 	}
+	// 	return
+	// }
+
 	if err != nil {
 		global.Logger.Errorf(c, "svc.RegisterUser err: %v", err)
+		fmt.Println("router error:", err)
 
-		if err.Error() == "username already exists" {
+		if customErr, ok := err.(*errcode.Error); ok {
+			response.ToErrorResponse(customErr)
+		} else if err.Error() == "username already exists" {
 			response.ToErrorResponse(errcode.NewError(20010001, "用户名已存在"))
-
-			response.ToErrorResponse(errcode.ErrorRegisterUserFail)
-			return
+			// response.ToErrorResponse(err)
 		} else {
-			response.ToResponse(gin.H{"新增接口成功": "200"})
+			response.ToErrorResponse(errcode.ErrorRegisterUserFail.WithDetails(err.Error()))
 		}
+		return
 	}
 
-	return
+	response.ToResponse(gin.H{"新增接口成功": "200"})
 }
 
 // @Summary 更新用户

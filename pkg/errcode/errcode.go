@@ -14,8 +14,8 @@ type Error struct {
 var codes = map[int]string{}
 
 func NewError(code int, msg string) *Error {
-	if _, ok := codes[code]; ok {
-		panic(fmt.Sprintf("错误码 %d已经存在,请更换一个", code))
+	if existingMsg, ok := codes[code]; ok {
+		fmt.Printf("警告: 错误码 %d 已经存在。原消息: '%s', 新消息: '%s'\n", code, existingMsg, msg)
 	}
 	codes[code] = msg
 	return &Error{code: code, msg: msg}
