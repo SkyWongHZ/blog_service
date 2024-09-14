@@ -2,173 +2,154 @@ package logger
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"io"
-	"log"
-	"runtime"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-type Level int8
+type Level = zapcore.Level
+
+const (
+	LevelDebug Level = zapcore.DebugLevel
+	LevelInfo  Level = zapcore.InfoLevel
+	LevelWarn  Level = zapcore.WarnLevel
+	LevelError Level = zapcore.ErrorLevel
+	LevelFatal Level = zapcore.FatalLevel
+	LevelPanic Level = zapcore.PanicLevel
+)
 
 type Fields map[string]interface{}
 
 type Logger struct {
-	newLogger *log.Logger
-	ctx       context.Context
-	fields    Fields
-	callers   []string
+	l     *zap.Logger
+	sugar *zap.SugaredLogger
 }
 
-const (
-	LevelDebug Level = iota
-	LevelInfo
-	LevelWarn
-	LevelError
-	LevelFatal
-	LevelPanic
-)
+func NewLogger(writer io.Writer, prefix string, flag int) *Logger {
+	writeSyncer := zapcore.AddSync(writer)
 
-func (l Level) String() string {
-	switch l {
-	case LevelDebug:
-		return "debug"
-	case LevelInfo:
-		return "info"
-	case LevelWarn:
-		return "warn"
-	case LevelError:
-		return "error"
-	case LevelFatal:
-		return "fatal"
-	case LevelPanic:
-		return "panic"
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
-	return ""
-}
 
-func NewLogger(w io.Writer, prefix string, flag int) *Logger {
-	l := log.New(w, prefix, flag)
-	return &Logger{newLogger: l}
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+	core := zapcore.NewCore(encoder, writeSyncer, zapcore.InfoLevel)
+
+	logger := zap.New(core, zap.AddCaller())
+	sugar := logger.Sugar()
+
+	return &Logger{
+		l:     logger,
+		sugar: sugar,
+	}
 }
 
 func (l *Logger) clone() *Logger {
-	nl := *l
-	return &nl
+	return &Logger{
+		l:     l.l,
+		sugar: l.sugar,
+	}
 }
 
 func (l *Logger) WithTrace() *Logger {
-	ginCtx, ok := l.ctx.(*gin.Context)
-	if ok {
-		return l.WithFields(Fields{
-			"trace_id": ginCtx.MustGet("X-Trace-ID"),
-			"span_id":  ginCtx.MustGet("X-Span-ID"),
-		})
-	}
 	return l
 }
 
 func (l *Logger) WithFields(f Fields) *Logger {
-	ll := l.clone()
-	if ll.fields == nil {
-		ll.fields = make(Fields)
-	}
+	fields := make([]zap.Field, 0, len(f))
 	for k, v := range f {
-		ll.fields[k] = v
+		fields = append(fields, zap.Any(k, v))
 	}
-	return ll
+	nl := l.clone()
+	nl.l = nl.l.With(fields...)
+	nl.sugar = nl.l.Sugar()
+	return nl
 }
 
 func (l *Logger) WithContext(ctx context.Context) *Logger {
-	ll := l.clone()
-	ll.ctx = ctx
-	return ll
+	nl := l.clone()
+	nl.l = nl.l.With(zap.Any("context", ctx))
+	nl.sugar = nl.l.Sugar()
+	return nl
 }
 
 func (l *Logger) WithCaller(skip int) *Logger {
-	ll := l.clone()
-	pc, file, line, ok := runtime.Caller(skip)
-	if ok {
-		f := runtime.FuncForPC(pc)
-		ll.callers = []string{fmt.Sprintf("%s: %d %s", file, line, f.Name())}
-	}
-
-	return ll
+	nl := l.clone()
+	nl.l = nl.l.WithOptions(zap.AddCallerSkip(skip))
+	nl.sugar = nl.l.Sugar()
+	return nl
 }
 
 func (l *Logger) WithCallersFrames() *Logger {
-	maxCallerDepth := 25
-	minCallerDepth := 1
-	callers := []string{}
-	pcs := make([]uintptr, maxCallerDepth)
-	depth := runtime.Callers(minCallerDepth, pcs)
-	frames := runtime.CallersFrames(pcs[:depth])
-	for frame, more := frames.Next(); more; frame, more = frames.Next() {
-		callers = append(callers, fmt.Sprintf("%s: %d %s", frame.File, frame.Line, frame.Function))
-		if !more {
-			break
-		}
-	}
-	ll := l.clone()
-	ll.callers = callers
-	return ll
-}
-
-func (l *Logger) JSONFormat(level Level, message string) map[string]interface{} {
-	data := make(Fields, len(l.fields)+4)
-	data["level"] = level.String()
-	data["time"] = time.Now().Local().UnixNano()
-	data["message"] = message
-	data["callers"] = l.callers
-	if len(l.fields) > 0 {
-		for k, v := range l.fields {
-			if _, ok := data[k]; !ok {
-				data[k] = v
-			}
-		}
-	}
-
-	return data
+	// zap already includes caller information, so this is a no-op
+	return l
 }
 
 func (l *Logger) Output(level Level, message string) {
-	body, _ := json.Marshal(l.JSONFormat(level, message))
-	content := string(body)
 	switch level {
 	case LevelDebug:
-		l.newLogger.Print(content)
+		l.l.Debug(message)
 	case LevelInfo:
-		l.newLogger.Print(content)
+		l.l.Info(message)
 	case LevelWarn:
-		l.newLogger.Print(content)
+		l.l.Warn(message)
 	case LevelError:
-		l.newLogger.Print(content)
+		l.l.Error(message)
 	case LevelFatal:
-		l.newLogger.Fatal(content)
+		l.l.Fatal(message)
 	case LevelPanic:
-		l.newLogger.Panic(content)
+		l.l.Panic(message)
 	}
 }
 
 func (l *Logger) Info(v ...interface{}) {
-	l.Output(LevelInfo, fmt.Sprint(v...))
+	l.sugar.Info(v...)
 }
 
 func (l *Logger) Infof(format string, v ...interface{}) {
-	l.Output(LevelInfo, fmt.Sprintf(format, v...))
+	l.sugar.Infof(format, v...)
 }
 
 func (l *Logger) Fatal(v ...interface{}) {
-	l.Output(LevelFatal, fmt.Sprint(v...))
+	l.sugar.Fatal(v...)
 }
 
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.Output(LevelFatal, fmt.Sprintf(format, v...))
+	l.sugar.Fatalf(format, v...)
 }
 
 func (l *Logger) Errorf(ctx context.Context, format string, v ...interface{}) {
-	l.WithContext(ctx).Output(LevelError, fmt.Sprintf(format, v...))
+	l.WithContext(ctx).sugar.Errorf(format, v...)
+}
+
+// 新增的方法，用于支持trace功能
+func (l *Logger) WithTraceFromGin(ctx *gin.Context) *Logger {
+	traceID, _ := ctx.Get("X-Trace-ID")
+	spanID, _ := ctx.Get("X-Span-ID")
+	return l.WithFields(Fields{
+		"trace_id": traceID,
+		"span_id":  spanID,
+	})
+}
+
+// 如果需要访问底层的zap.Logger
+func (l *Logger) GetZapLogger() *zap.Logger {
+	return l.l
+}
+
+// 关闭日志，确保所有日志都被写入
+func (l *Logger) Sync() error {
+	return l.l.Sync()
 }
