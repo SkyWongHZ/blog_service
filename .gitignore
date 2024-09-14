@@ -2,3 +2,5 @@
 .VSCodeCounter
 __debug_bin*
 storage/logs/app.log
+
+**/config.yaml
