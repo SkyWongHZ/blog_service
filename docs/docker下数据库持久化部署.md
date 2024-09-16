@@ -29,10 +29,10 @@ docker volume create <卷名>
 docker run -d --name <new_mysql_container_name> --network <自定义网格名> -e MYSQL_ROOT_PASSWORD=your_new_password -e MYSQL_DATABASE=blog_service -v blog_service_mysql_data:/var/lib/mysql -p 3306:3306 --restart always mysql:latest
 ```
 
-+ `<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);"><new_mysql_container_name></font>`<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);">: 新的 MySQL 容器的名称</font>
-+ `<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);"><your_root_password></font>`<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);">: MySQL root 用户的密码</font>
-+ `<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);"><your_mysql_volume_name></font>`<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);">: 您的 MySQL 数据 volume 的名称</font>
-+ `<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);"><host_port></font>`<font style="color:rgb(0, 0, 0);background-color:rgb(247, 247, 247);">: 主机上映射到 MySQL 3306 端口的端口号</font>
+- `<new_mysql_container_name>`: 新的 MySQL 容器的名称
+- `<your_root_password>`: MySQL root 用户的密码
+- `<your_mysql_volume_name>`: 您的 MySQL 数据 volume 的名称
+- `<host_port>`: 主机上映射到 MySQL 3306 端口的端口号
 
 #### <font style="color:rgb(0, 0, 0);">docker下登录mysql </font>
 ```plain
