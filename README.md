@@ -11,12 +11,12 @@
 
 ### 整个系统
 * ~~部署到云服务器,上nginx和docker~~
-* 修改日志为zap
+* ~~修改日志为zap~~
 * 建自动化流水线  CI/CD(docker  compose或直接挂载)
 * ~~写脚本deploy.sh支持自动化部署~~
 * ~~yaml支持远程和本地数据库配置~~
 * API网关  
-* ~~鉴权服务  ~~ 
+* ~~鉴权服务~~ 
 * 项目上redis
 * grpc 
 * websocket 
