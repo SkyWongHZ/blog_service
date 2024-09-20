@@ -39,7 +39,7 @@ FROM hub.atomgit.com/amd64/alpine:3.15.10
 
 # 创建配置文件目录并复制配置文件
 RUN mkdir -p /root/configs
-COPY configs /root/configs
+
 
 # 安装必要的 ca-certificates
 # RUN apk update && apk add --no-cache ca-certificates
@@ -50,7 +50,7 @@ WORKDIR /root/
 
 # 从 builder 镜像复制构建的二进制文件
 COPY --from=builder /app/main .
-COPY configs/config.yaml /root/config.yaml
+COPY configs/config.yaml /root/configs/config.yaml
 
 # 确保二进制文件可执行
 RUN chmod +x ./main

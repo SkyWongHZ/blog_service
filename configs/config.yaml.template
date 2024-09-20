@@ -1,0 +1,26 @@
+Server:
+  RunMode: debug
+  HttpPort: 8080
+  ReadTimeout: 60
+  WriteTimeout: 60
+App:
+  DefaultPageSize: 10
+  MaxPageSize: 100
+  LogSavePath: storage/logs
+  LogFileName: app
+  LogFileExt: .log
+Database:
+  DBType: mysql
+  Username: ${DB_USERNAME}
+  Password: ${DB_PASSWORD}
+  Host: ${DB_HOST}
+  DBName: ${DB_NAME}
+  TablePrefix: blog_
+  Charset: utf8
+  ParseTime: True
+  MaxIdleConns: 10
+  MaxOpenConns: 30
+JWT:
+  Secret: ${JWT_SECRET}
+  Issuer: blog-service
+  Expire: 7200
