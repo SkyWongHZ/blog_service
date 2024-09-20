@@ -1,28 +1,55 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go
+name: Deploy to Aliyun Server
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      deployMessage:
+        description: 'Deployment message'
+        required: true
+        default: 'Manual deployment triggered'
+
 
 jobs:
-
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
+        go-version: '1.21'
 
     - name: Build
       run: go build -v ./...
 
     - name: Test
       run: go test -v ./...
+
+    - name: Login to Aliyun Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com
+        username: 爱新觉罗钮钴禄东东
+        password: ${{ secrets.ALIYUN_CR_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: true
+        tags: crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:${{ github.sha }},crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:latest
+
+    - name: Deploy to Aliyun Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.ALIYUN_SERVER_IP }}
+        username: ${{ secrets.ALIYUN_SERVER_USER }}
+        key: ${{ secrets.ALIYUN_SERVER_SSH_KEY }}
+        script: |
+          docker login --username=爱新觉罗钮钴禄东东 --password=${{ secrets.ALIYUN_CR_PASSWORD }} crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com
+          docker pull crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:latest
+          docker stop blog-service || true
+          docker rm blog-service || true
+          docker run -d --network my-network --name blog-service -p 8080:8080 --restart always crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:latest
