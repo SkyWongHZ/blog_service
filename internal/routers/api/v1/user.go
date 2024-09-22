@@ -108,7 +108,7 @@ func (t User) Create(c *gin.Context) {
 		return
 	}
 
-	response.ToResponse(gin.H{"新增接口成功!!!": "200"})
+	response.ToResponse(gin.H{"新增接口成功": "200"})
 }
 
 // @Summary 更新用户
