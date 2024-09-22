@@ -15,7 +15,7 @@
 - [x] 鉴权服务 
 - [ ] grpc 
 - [ ] websocket
-- [ ] github  actinon自动化部署
+- [x] github  actinon自动化部署
 - [ ] 缓存redis
 - [ ] 消息队列：可以先用 Redis，之后可以考虑 RabbitMQ 或 Kafka
 - [ ] 全文搜索：Elasticsearch（如果您需要高级搜索功能）
