@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -10,7 +11,9 @@ import (
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/internal/routers"
 	"github.com/go-programming-tour-book/blog-service/pkg/logger"
+	"github.com/go-programming-tour-book/blog-service/pkg/redis"
 	"github.com/go-programming-tour-book/blog-service/pkg/setting"
+	"github.com/spf13/viper"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -27,6 +30,10 @@ func init() {
 	if err != nil {
 		log.Fatalf("init.setupDBEngine err:%v", err)
 	}
+	err = setupRedis()
+	if err != nil {
+		log.Fatal("init.setupRedis err:%v", err)
+	}
 }
 
 // @title 博客系统
@@ -34,6 +41,13 @@ func init() {
 // @description 用go搭建的博客系统
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
+
+	defer func() {
+		if global.RedisClient != nil {
+			global.RedisClient.Close()
+		}
+	}()
+
 	router := routers.NewRouter()
 	s := &http.Server{
 		Addr:           ":" + global.ServerSetting.HttpPort,
@@ -84,12 +98,24 @@ func setupLogger() error {
 	return nil
 }
 
-
-
-
 func setupDBEngine() error {
 	var err error
 	global.DBEngine, err = model.NewDBEngine(global.DatabaseSetting)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func setupRedis() error {
+	global.RedisClient = redis.NewClient(
+		viper.GetString("redis.addr"),
+		viper.GetString("redis.password"),
+		viper.GetInt("redis.db"),
+	)
+	// 测试连接
+	ctx := context.Background()
+	_, err := global.RedisClient.Ping(ctx).Result()
 	if err != nil {
 		return err
 	}

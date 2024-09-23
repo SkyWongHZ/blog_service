@@ -7,6 +7,7 @@ import (
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
 	"github.com/go-programming-tour-book/blog-service/pkg/errcode"
 )
+
 // @Summary 获取授权Token
 // @Produce json
 // @Param app_key query string true "应用关键字"
