@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -11,8 +11,10 @@ import (
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/internal/routers"
 	"github.com/go-programming-tour-book/blog-service/pkg/logger"
+
 	"github.com/go-programming-tour-book/blog-service/pkg/redis"
 	"github.com/go-programming-tour-book/blog-service/pkg/setting"
+
 	"github.com/spf13/viper"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
@@ -41,6 +43,11 @@ func init() {
 // @description 用go搭建的博客系统
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
+
+	err := redis.BanUser("test")
+	if err != nil {
+		fmt.Printf("Failed to ban test user: %v", err)
+	}
 
 	defer func() {
 		if global.RedisClient != nil {
@@ -108,16 +115,18 @@ func setupDBEngine() error {
 }
 
 func setupRedis() error {
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("./configs") // 指定 configs 目录
+
+	if err := viper.ReadInConfig(); err != nil {
+		return fmt.Errorf("failed to read config file: %w", err)
+	}
 	global.RedisClient = redis.NewClient(
 		viper.GetString("redis.addr"),
 		viper.GetString("redis.password"),
 		viper.GetInt("redis.db"),
 	)
-	// 测试连接
-	ctx := context.Background()
-	_, err := global.RedisClient.Ping(ctx).Result()
-	if err != nil {
-		return err
-	}
 	return nil
 }

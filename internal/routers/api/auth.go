@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/go-programming-tour-book/blog-service/pkg/redis"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/service"
@@ -32,6 +34,18 @@ func GetAuth(c *gin.Context) {
 	if err != nil {
 		global.Logger.Errorf(c, "svc.CheckAuth err: %v", err)
 		response.ToErrorResponse(errcode.UnauthorizedAuthNotExist)
+		return
+	}
+
+	// Redis黑名单
+	banned, err := redis.IsUserBanned(param.AppKey)
+	if err != nil {
+		global.Logger.Errorf(c, "redis.IsUserBanned err: %v", err)
+		response.ToErrorResponse(errcode.ServerError)
+		return
+	}
+	if banned {
+		response.ToErrorResponse(errcode.UnauthorizedAppKeyBanned)
 		return
 	}
 
