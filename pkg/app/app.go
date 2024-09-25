@@ -57,27 +57,12 @@ func (r *Response) ToResponseList(list interface{}, totalRows int) {
 	})
 }
 
-// func (r *Response) ToErrorResponse(err *errcode.Error) {
-//     response := StandardResponse{
-//         Code: err.Code(),
-//         Msg:  err.Msg(),
-//         Data: nil,
-//     }
-//     details := err.Details()
-//     if len(details) > 0 {
-//         response.Data = gin.H{"details": details}
-//     }
-//     r.Ctx.JSON(err.StatusCode(), response)
-// }
-
 func (r *Response) ToErrorResponse(err error) {
 	var response StandardResponse
 	var statusCode int
-	fmt.Println("gg", err)
 	switch e := err.(type) {
 
 	case *errcode.Error:
-		fmt.Println("222")
 		response = StandardResponse{
 			Code: e.Code(),
 			Msg:  e.Msg(),
@@ -90,7 +75,6 @@ func (r *Response) ToErrorResponse(err error) {
 
 		statusCode = e.StatusCode()
 	default:
-		fmt.Println("3333")
 		// 处理非 errcode.Error 类型的错误（如内部服务器错误）
 		serverError := errcode.ServerError
 		response = StandardResponse{

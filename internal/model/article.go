@@ -66,17 +66,18 @@ type ArticleRow struct {
 func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int) ([]*ArticleRow, error) {
 	fields := []string{"ar.id AS article_id", "ar.title AS article_title", "ar.desc AS article_desc", "ar.cover_image_url", "ar.content"}
 	fields = append(fields, []string{"t.id AS tag_id", "t.name AS tag_name"}...)
-
-	if pageOffset >= 0 && pageSize > 0 {
-		db = db.Offset(pageOffset).Limit(pageSize)
-	}
-	rows, err := db.Select(fields).Table(ArticleTag{}.TableName()+" AS at").
+	query := db.Select(fields).Table(Article{}.TableName()+" AS ar").
+		Joins("LEFT JOIN `"+ArticleTag{}.TableName()+"` AS at ON ar.id = at.article_id").
 		Joins("LEFT JOIN `"+Tag{}.TableName()+"` AS t ON at.tag_id = t.id").
-		Joins("LEFT JOIN `"+Article{}.TableName()+"` AS ar ON at.article_id = ar.id").
-		Where("at.`tag_id` = ? AND ar.state = ? AND ar.is_del = ?", tagID, a.State, 0).
-		Rows()
-
-		// 结果处理
+		Where("ar.state = ? AND ar.is_del = ?", a.State, 0)
+	if tagID != 0 {
+		query = query.Where("at.`tag_id` = ?", tagID)
+	}
+	if pageOffset >= 0 && pageSize > 0 {
+		query = query.Offset(pageOffset).Limit(pageSize)
+	}
+	rows, err := query.Rows()
+	// 结果处理
 	if err != nil {
 		return nil, err
 	}
@@ -97,15 +98,19 @@ func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int
 
 // 根据标签id获取文章数量
 func (a Article) CountByTagID(db *gorm.DB, tagID uint32) (int, error) {
-	var count int
-	err := db.Table(ArticleTag{}.TableName()+" AS at").
-		Joins("LEFT JOIN `"+Tag{}.TableName()+"` AS t ON at.tag_id = t.id").
-		Joins("LEFT JOIN `"+Article{}.TableName()+"` AS ar ON at.article_id = ar.id").
-		Where("at.`tag_id` = ? AND ar.state = ? AND ar.is_del = ?", tagID, a.State, 0).
-		Count(&count).Error
+	var count int64
+	query := db.Table(Article{}.TableName()+" AS ar").
+		Where("ar.state = ? AND ar.is_del = ?", a.State, 0)
+
+	if tagID != 0 {
+		query = query.Joins("INNER JOIN `"+ArticleTag{}.TableName()+"` AS at ON ar.id = at.article_id").
+			Where("at.tag_id = ?", tagID)
+	}
+
+	err := query.Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
 
-	return count, nil
+	return int(count), nil
 }

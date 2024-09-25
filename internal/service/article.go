@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/go-programming-tour-book/blog-service/internal/dao"
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
@@ -12,8 +14,8 @@ type ArticleRequest struct {
 }
 
 type ArticleListRequest struct {
-	TagID uint32 `form:"tag_id" binding:"gte=1"`
-	State uint8  `form:"state,default=1" binding:"oneof=0 1"`
+	TagID *uint32 `form:"tag_id" binding:"omitempty,gte=1"`
+	State uint8   `form:"state,default=1" binding:"oneof=0 1"`
 }
 
 type CreateArticleRequest struct {
@@ -79,12 +81,20 @@ func (svc *Service) GetArticle(param *ArticleRequest) (*Article, error) {
 }
 
 func (svc *Service) GetArticleList(param *ArticleListRequest, pager *app.Pager) ([]*Article, int, error) {
-	articleCount, err := svc.dao.CountArticleListByTagID(param.TagID, param.State)
+	var tagID uint32
+	if param.TagID != nil {
+		tagID = *param.TagID
+	} else {
+		tagID = 0
+	}
+
+	articleCount, err := svc.dao.CountArticleListByTagID(tagID, param.State)
+	fmt.Println("articleCount", articleCount)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	articles, err := svc.dao.GetArticleListByTagID(param.TagID, param.State, pager.Page, pager.PageSize)
+	articles, err := svc.dao.GetArticleListByTagID(tagID, param.State, pager.Page, pager.PageSize)
 	if err != nil {
 		return nil, 0, err
 	}
