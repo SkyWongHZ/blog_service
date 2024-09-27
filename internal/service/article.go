@@ -170,3 +170,24 @@ func (svc *Service) DeleteArticle(param *DeleteArticleRequest) error {
 
 	return nil
 }
+
+func (svc *Service) GetHotArticles() ([]*Article, error) {
+	articles, err := svc.dao.GetHotArticles()
+	if err != nil {
+		return nil, err
+	}
+
+	var hotArticles []*Article
+	for _, article := range articles {
+		hotArticles = append(hotArticles, &Article{
+			ID:            article.ID,
+			Title:         article.Title,
+			Desc:          article.Desc,
+			Content:       article.Content,
+			CoverImageUrl: article.CoverImageUrl,
+			State:         article.State,
+		})
+	}
+
+	return hotArticles, nil
+}

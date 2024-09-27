@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/go-programming-tour-book/blog-service/pkg/redis"
 	"github.com/jinzhu/gorm"
 )
 
@@ -21,6 +22,8 @@ func (a Article) Create(db *gorm.DB) (*Article, error) {
 	if err := db.Create(&a).Error; err != nil {
 		return nil, err
 	}
+	// 缓存最新文章id
+	redis.CacheLatestArticleID(a.ID)
 
 	return &a, nil
 }
@@ -50,6 +53,25 @@ func (a Article) Delete(db *gorm.DB) error {
 	}
 
 	return nil
+}
+
+func (a Article) GetHotArticles(db *gorm.DB) ([]*Article, error) {
+	latestIDs, err := redis.GetLatestArticleIDs()
+	if err != nil {
+		return a.GetLatestArticlesFromDB(db)
+	}
+
+	// 从数据库获取完整文章信息
+	var articles []*Article
+	err = db.Where("id IN (?)", latestIDs).Find(&articles).Error
+	return articles, err
+}
+
+func (a Article) GetLatestArticlesFromDB(db *gorm.DB) ([]*Article, error) {
+	var articles []*Article
+	// 按创建时间降序
+	err := db.Order("created_at DESC").Limit(2).Find(&articles).Error
+	return articles, err
 }
 
 type ArticleRow struct {

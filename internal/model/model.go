@@ -16,13 +16,13 @@ const (
 )
 
 type Model struct {
-	ID         uint32 `gorm:"primary_key" json:"id",omitempty`
-	CreatedBy  string `json:"created_by",omitempty`
-	ModifiedBy string `json:"modified_by",omitempty`
-	CreatedOn  uint32 `json:"created_on",omitempty`
-	ModifiedOn uint32 `json:"modified_on",omitempty`
-	DeletedOn  uint32 `json:"delete_on",omitempty`
-	IsDel      uint8  `json:"is_del",omitempty`
+	ID         uint32 `gorm:"primary_key" json:"id,omitempty"`
+	CreatedBy  string `json:"created_by,omitempty"`
+	ModifiedBy string `json:"modified_by,omitempty"`
+	CreatedOn  uint32 `json:"created_on,omitempty"`
+	ModifiedOn uint32 `json:"modified_on,omitempty"`
+	DeletedOn  uint32 `json:"deleted_on,omitempty"`
+	IsDel      uint8  `json:"is_del,omitempty"`
 }
 
 func NewDBEngine(databaseSetting *setting.DatabaseSettingS) (*gorm.DB, error) {

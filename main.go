@@ -49,6 +49,14 @@ func main() {
 		fmt.Printf("Failed to ban test user: %v", err)
 	}
 
+	// 模拟添加新文章
+	// redis.CacheLatestArticleID(101)
+	// redis.CacheLatestArticleID(102)
+	// redis.CacheLatestArticleID(103)
+
+	// latestIDs, err := redis.GetLatestArticleIDs()
+	// fmt.Println("latestIDs", latestIDs)
+
 	defer func() {
 		if global.RedisClient != nil {
 			global.RedisClient.Close()
@@ -128,5 +136,6 @@ func setupRedis() error {
 		viper.GetString("redis.password"),
 		viper.GetInt("redis.db"),
 	)
+
 	return nil
 }

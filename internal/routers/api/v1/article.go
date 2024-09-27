@@ -176,3 +176,21 @@ func (a Article) Delete(c *gin.Context) {
 	response.ToResponse(gin.H{})
 	return
 }
+
+// @Summary 获取热门文章
+// @Produce json
+// @Success 200 {array} Article "热门文章列表"
+// @Failure 500 {object} errcode.Error "内部错误"
+// @Router /api/v1/articles/hot [get]
+func (a Article) GetHotArticles(c *gin.Context) {
+	response := app.NewResponse(c)
+	svc := service.New(c.Request.Context())
+	articles, err := svc.GetHotArticles()
+	if err != nil {
+		global.Logger.Errorf(c, "svc.GetHotArticles err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetHotArticlesFail)
+		return
+	}
+
+	response.ToResponse(articles)
+}
