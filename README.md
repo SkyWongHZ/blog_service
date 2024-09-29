@@ -23,6 +23,8 @@
 - [ ] 对象存储：MinIO 或云服务（如阿里云 OSS、AWS S3）用于存储用户上传的图片等文件
 - [ ] 权限控制：Casbin
 - [ ] 定时任务
+- [ ] traefik部署到docker-compose
+
 
 swagger地址
 http://118.178.184.13:8080/swagger/index.html
