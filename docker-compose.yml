@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.blog-service.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.blog-service.entrypoints=web"
       - "traefik.http.services.blog-service.loadbalancer.server.port=8080"
     networks:
       - traefik-public
