@@ -1,0 +1,20 @@
+
+version: '3'
+
+services:
+  blog-service:
+    build: .
+    container_name: blog-service
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blog-service.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.blog-service.entrypoints=web"
+      - "traefik.http.services.blog-service.loadbalancer.server.port=8080"
+    networks:
+      - traefik-public
+      - default
+
+networks:
+  traefik-public:
+    external: true
