@@ -34,7 +34,7 @@ func init() {
 	}
 	err = setupRedis()
 	if err != nil {
-		log.Fatal("init.setupRedis err:%v", err)
+		log.Fatalf("init.setupRedis err:%v", err)
 	}
 }
 
