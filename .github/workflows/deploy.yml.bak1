@@ -64,6 +64,9 @@ jobs:
           docker rm blog-service || true
           docker run -d \
             --name blog-service \
-            -p 8080:8080 \
+            --network traefik-public \
+            --label "traefik.enable=true" \
+            --label "traefik.http.routers.blog-service.entrypoints=web" \
+            --label "traefik.http.services.blog-service.loadbalancer.server.port=8080" \
             --restart always \
             crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:latest
