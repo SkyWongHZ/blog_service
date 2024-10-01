@@ -66,10 +66,7 @@ jobs:
             --name blog-service \
             --network traefik-public \
             --label "traefik.enable=true" \
-            --label "traefik.http.routers.blog-service.rule=PathPrefix(`/blog`)" \
             --label "traefik.http.routers.blog-service.entrypoints=web" \
-            --label "traefik.http.middlewares.strip-blog-prefix.stripprefix.prefixes=/blog" \
-            --label "traefik.http.routers.blog-service.middlewares=strip-blog-prefix@docker" \
             --label "traefik.http.services.blog-service.loadbalancer.server.port=8080" \
             --restart always \
             crpi-7pvk5xebkb6d01bu.cn-hangzhou.personal.cr.aliyuncs.com/docker_sky_private/blog-service:latest

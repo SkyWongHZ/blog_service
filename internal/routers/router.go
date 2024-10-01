@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-programming-tour-book/blog-service/internal/middleware"
 	"github.com/go-programming-tour-book/blog-service/internal/routers/api"
 	v1 "github.com/go-programming-tour-book/blog-service/internal/routers/api/v1"
 
@@ -30,7 +31,7 @@ func NewRouter() *gin.Engine {
 	r.POST("auth", api.GetAuth)
 	apiv1 := r.Group("/api/v1")
 	// JWT中间件使用
-	// apiv1.Use(middleware.JWT())
+	apiv1.Use(middleware.JWT())
 	{
 
 		apiv1.POST("/tags", tag.Create)
