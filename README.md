@@ -5,6 +5,7 @@
 - [ ] 注册用户接口密码做加密措施
 - [x] 用户名去重逻辑((用户user,文章article,标签Tag都有类似问题))
 - [x] 接口返回有问题  做成data  code   msg形式
+- [ ] 评论模块
 
 ### 技术栈
 - [x] 部署到云服务器,上nginx和docker
@@ -23,7 +24,9 @@
 - [ ] 对象存储：MinIO 或云服务（如阿里云 OSS、AWS S3）用于存储用户上传的图片等文件
 - [ ] 权限控制：Casbin
 - [ ] 定时任务
-- [ ] traefik部署到docker-compose
+- [x] docker-compose使用
+- [ ] Oauth2.0
+
 
 
 swagger地址
