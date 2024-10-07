@@ -11,7 +11,7 @@ type Article struct {
 	Title         string `json:"title"`
 	Desc          string `json:"desc"`
 	Content       string `json:"content"`
-	CoverImageUrl string `json:"cover_image_url"`
+	CoverImageKey string `json:"cover_image_key"`
 	CreatedBy     string `json:"created_by"`
 	ModifiedBy    string `json:"modified_by"`
 	State         uint8  `json:"state"`
@@ -22,34 +22,34 @@ func (d *Dao) CreateArticle(param *Article) (*model.Article, error) {
 		Title:         param.Title,
 		Desc:          param.Desc,
 		Content:       param.Content,
-		CoverImageUrl: param.CoverImageUrl,
+		CoverImageKey: param.CoverImageKey,
 		State:         param.State,
 		Model:         &model.Model{CreatedBy: param.CreatedBy},
 	}
 	return article.Create(d.engine)
 }
 
-func (d *Dao) UpdateArticle(param *Article) error {
-	article := model.Article{Model: &model.Model{ID: param.ID}}
-	values := map[string]interface{}{
-		"modified_by": param.ModifiedBy,
-		"state":       param.State,
-	}
-	if param.Title != "" {
-		values["title"] = param.Title
-	}
-	if param.CoverImageUrl != "" {
-		values["cover_image_url"] = param.CoverImageUrl
-	}
-	if param.Desc != "" {
-		values["desc"] = param.Desc
-	}
-	if param.Content != "" {
-		values["content"] = param.Content
-	}
+// func (d *Dao) UpdateArticle(param *Article) error {
+// 	article := model.Article{Model: &model.Model{ID: param.ID}}
+// 	values := map[string]interface{}{
+// 		"modified_by": param.ModifiedBy,
+// 		"state":       param.State,
+// 	}
+// 	if param.Title != "" {
+// 		values["title"] = param.Title
+// 	}
+// 	if param.CoverImageUrl != "" {
+// 		values["cover_image_url"] = param.CoverImageUrl
+// 	}
+// 	if param.Desc != "" {
+// 		values["desc"] = param.Desc
+// 	}
+// 	if param.Content != "" {
+// 		values["content"] = param.Content
+// 	}
 
-	return article.Update(d.engine, values)
-}
+// 	return article.Update(d.engine, values)
+// }
 
 func (d *Dao) GetArticle(id uint32, state uint8) (model.Article, error) {
 	article := model.Article{Model: &model.Model{ID: id}, State: state}
@@ -71,7 +71,6 @@ func (d *Dao) GetArticleListByTagID(id uint32, state uint8, page, pageSize int) 
 	return article.ListByTagID(d.engine, id, app.GetPageOffset(page, pageSize), pageSize)
 }
 
-
 func (d *Dao) GetHotArticles() ([]*model.Article, error) {
-    return model.Article{}.GetHotArticles(d.engine)
+	return model.Article{}.GetHotArticles(d.engine)
 }

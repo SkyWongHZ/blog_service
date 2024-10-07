@@ -10,7 +10,7 @@ type Article struct {
 	Title         string `json:"title"`
 	Desc          string `json:"desc"`
 	Content       string `json:"content"`
-	CoverImageUrl string `json:"cover_image_url"`
+	CoverImageKey string `json:"cover_image_key"`
 	State         uint8  `json:"state"`
 }
 
@@ -23,7 +23,7 @@ func (a Article) Create(db *gorm.DB) (*Article, error) {
 		return nil, err
 	}
 	// 缓存最新文章id
-	redis.CacheLatestArticleID(a.ID)
+	// redis.CacheLatestArticleID(a.ID)
 
 	return &a, nil
 }

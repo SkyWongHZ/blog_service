@@ -1,6 +1,9 @@
 package v1
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/service"
@@ -94,14 +97,30 @@ func (a Article) List(c *gin.Context) {
 func (a Article) Create(c *gin.Context) {
 	param := service.CreateArticleRequest{}
 	response := app.NewResponse(c)
+	// 打印接收到的原始数据
+	fmt.Printf("Received form data: %+v", c.Request.MultipartForm)
 	valid, errs := app.BindAndValid(c, &param)
+
+	// 打印绑定后的参数
+	fmt.Printf("Bound parameters: %+v", param)
+
 	if !valid {
 		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
 		return
 	}
 
+	// 处理文件上传（如果有）
+	if param.CoverImageUrl != nil {
+		fileType := filepath.Ext(param.CoverImageUrl.Filename)
+		if fileType != ".jpg" && fileType != ".png" {
+			response.ToErrorResponse(errcode.InvalidParams.WithDetails("file type not allowed"))
+			return
+		}
+	}
+
 	svc := service.New(c.Request.Context())
+	fmt.Printf("Creating article with params: %+v", param)
 	err := svc.CreateArticle(&param)
 	if err != nil {
 		global.Logger.Errorf(c, "svc.CreateArticle err: %v", err)
@@ -126,27 +145,27 @@ func (a Article) Create(c *gin.Context) {
 // @Success 200 {object} Article "文章更新成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Router /api/v1/articles/{id} [put]
-func (a Article) Update(c *gin.Context) {
-	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
-	response := app.NewResponse(c)
-	valid, errs := app.BindAndValid(c, &param)
-	if !valid {
-		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
-		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
-		return
-	}
+// func (a Article) Update(c *gin.Context) {
+// 	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+// 	response := app.NewResponse(c)
+// 	valid, errs := app.BindAndValid(c, &param)
+// 	if !valid {
+// 		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+// 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+// 		return
+// 	}
 
-	svc := service.New(c.Request.Context())
-	err := svc.UpdateArticle(&param)
-	if err != nil {
-		global.Logger.Errorf(c, "svc.UpdateArticle err: %v", err)
-		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
-		return
-	}
+// 	svc := service.New(c.Request.Context())
+// 	err := svc.UpdateArticle(&param)
+// 	if err != nil {
+// 		global.Logger.Errorf(c, "svc.UpdateArticle err: %v", err)
+// 		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
+// 		return
+// 	}
 
-	response.ToResponse(gin.H{})
-	return
-}
+// 	response.ToResponse(gin.H{})
+// 	return
+// }
 
 // @Summary 删除文章
 // @Produce json
@@ -181,16 +200,16 @@ func (a Article) Delete(c *gin.Context) {
 // @Produce json
 // @Success 200 {array} Article "热门文章列表"
 // @Failure 500 {object} errcode.Error "内部错误"
-// @Router /api/v1/articles/hot [get]
-func (a Article) GetHotArticles(c *gin.Context) {
-	response := app.NewResponse(c)
-	svc := service.New(c.Request.Context())
-	articles, err := svc.GetHotArticles()
-	if err != nil {
-		global.Logger.Errorf(c, "svc.GetHotArticles err: %v", err)
-		response.ToErrorResponse(errcode.ErrorGetHotArticlesFail)
-		return
-	}
+// // @Router /api/v1/articles/hot [get]
+// func (a Article) GetHotArticles(c *gin.Context) {
+// 	response := app.NewResponse(c)
+// 	svc := service.New(c.Request.Context())
+// 	articles, err := svc.GetHotArticles()
+// 	if err != nil {
+// 		global.Logger.Errorf(c, "svc.GetHotArticles err: %v", err)
+// 		response.ToErrorResponse(errcode.ErrorGetHotArticlesFail)
+// 		return
+// 	}
 
-	response.ToResponse(articles)
-}
+// 	response.ToResponse(articles)
+// }

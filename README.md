@@ -6,6 +6,7 @@
 - [x] 用户名去重逻辑((用户user,文章article,标签Tag都有类似问题))
 - [x] 接口返回有问题  做成data  code   msg形式
 - [ ] 评论模块
+- [ ] 添加minio后文章模块的业务逻辑修改,使用阿里云oss
 
 ### 技术栈
 - [x] 部署到云服务器,上nginx和docker

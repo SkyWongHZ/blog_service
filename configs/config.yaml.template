@@ -24,3 +24,12 @@ JWT:
   Secret: ${JWT_SECRET}
   Issuer: blog-service
   Expire: 7200
+Redis:
+  Addr: ${REDIS_ADDR}
+  Password: ${REDIS_PASSWORD}
+  DB: ${REDIS_DB}
+Minio:
+  Endpoint: ${MINIO_ENDPOINT}
+  AccessKeyID: ${MINIO_ACCESS_KEY}
+  SecretAccessKey: ${MINIO_SECRET_KEY}
+  UseSSL: ${MINIO_USE_SSL}

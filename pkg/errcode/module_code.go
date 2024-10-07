@@ -13,6 +13,7 @@ var (
 	ErrorUpdateArticleFail  = NewError(20020004, "更新文章失败")
 	ErrorDeleteArticleFail  = NewError(20020005, "删除文章失败")
 	ErrorGetHotArticlesFail = NewError(20020006, "获取热门文章失败")
+	ErrorUploadFileFail     = NewError(20020007, "上传文件失败")
 
 	ErrorListUserFail     = NewError(20030001, "获取用户列表失败")
 	ErrorRegisterUserFail = NewError(20030002, "创建用户列表失败")

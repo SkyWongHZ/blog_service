@@ -42,6 +42,7 @@ CREATE TABLE `blog_article` (
   `title` varchar(100) DEFAULT '' COMMENT '文章标题',
   `desc` varchar(255) DEFAULT '' COMMENT '文章简述',
   `cover_image_url` varchar(255) DEFAULT '' COMMENT '封面图片地址',
+  `cover_image_key` varchar(255) DEFAULT '' COMMENT '封面图片对象键',
   `content` longtext COMMENT '文章内容',
   `created_on` int(10) unsigned DEFAULT '0' COMMENT '新建时间',
   `created_by` varchar(100) DEFAULT '' COMMENT '创建人',

@@ -11,6 +11,7 @@ import (
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/internal/routers"
 	"github.com/go-programming-tour-book/blog-service/pkg/logger"
+	"github.com/go-programming-tour-book/blog-service/pkg/minio"
 
 	"github.com/go-programming-tour-book/blog-service/pkg/redis"
 	"github.com/go-programming-tour-book/blog-service/pkg/setting"
@@ -35,6 +36,11 @@ func init() {
 	err = setupRedis()
 	if err != nil {
 		log.Fatalf("init.setupRedis err:%v", err)
+	}
+
+	err = setupMinio()
+	if err != nil {
+		log.Fatalf("init.setupMinio err:%v", err)
 	}
 }
 
@@ -138,4 +144,13 @@ func setupRedis() error {
 	)
 
 	return nil
+}
+
+func setupMinio() error {
+	return minio.NewMinioClient(
+		viper.GetString("Minio.Endpoint"),
+		viper.GetString("Minio.AccessKeyID"),
+		viper.GetString("Minio.SecretAccessKey"),
+		viper.GetBool("Minio.UseSSL"),
+	)
 }
