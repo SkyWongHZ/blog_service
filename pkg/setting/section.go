@@ -36,10 +36,23 @@ type JWTSettingS struct {
 	Expire time.Duration
 }
 
+type OSSSettingS struct {
+	Endpoint        string
+	AccessKeyID     string
+	AccessKeySecret string
+	BucketName      string
+	UseSSL          bool
+}
+
 func (s *Setting) ReadSection(k string, v interface{}) error {
 	err := s.vp.UnmarshalKey(k, v)
 	if err != nil {
 		return err
 	}
+	if _, ok := sections[k]; !ok {
+		sections[k] = v
+	}
 	return nil
 }
+
+var sections = make(map[string]interface{})

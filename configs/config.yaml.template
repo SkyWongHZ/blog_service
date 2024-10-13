@@ -33,3 +33,9 @@ Minio:
   AccessKeyID: ${MINIO_ACCESS_KEY}
   SecretAccessKey: ${MINIO_SECRET_KEY}
   UseSSL: ${MINIO_USE_SSL}
+OSS:
+  Endpoint: ${OSS_ENDPOINT}
+  AccessKeyID: ${OSS_ACCESS_KEY_ID}
+  AccessKeySecret: ${OSS_ACCESS_KEY_SECRET}
+  BucketName: ${OSS_BUCKET_NAME}
+  UseSSL: ${OSS_USE_SSL}

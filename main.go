@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/model"
@@ -41,6 +42,11 @@ func init() {
 	err = setupMinio()
 	if err != nil {
 		log.Fatalf("init.setupMinio err:%v", err)
+	}
+
+	err = setupOSS()
+	if err != nil {
+		log.Fatalf("init.setupOSS err:%v", err)
 	}
 }
 
@@ -153,4 +159,26 @@ func setupMinio() error {
 		viper.GetString("Minio.SecretAccessKey"),
 		viper.GetBool("Minio.UseSSL"),
 	)
+}
+
+func setupOSS() error {
+	ossClient, err := oss.New(
+		viper.GetString("OSS.Endpoint"),
+		viper.GetString("OSS.AccessKeyID"),
+		viper.GetString("OSS.AccessKeySecret"),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create OSS client: %w", err)
+	}
+
+	// 验证 bucket 是否存在并可访问
+	_, err = ossClient.Bucket(viper.GetString("OSS.BucketName"))
+	if err != nil {
+		return fmt.Errorf("failed to get OSS bucket: %w", err)
+	}
+
+	// 将 OSS 客户端保存到全局变量
+	global.OSSClient = ossClient
+
+	return nil
 }
