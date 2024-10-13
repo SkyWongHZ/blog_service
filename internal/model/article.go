@@ -12,6 +12,7 @@ type Article struct {
 	Content       string `json:"content"`
 	CoverImageKey string `json:"cover_image_key"`
 	State         uint8  `json:"state"`
+	CoverImageUrl string `json:"cover_image_url"`
 }
 
 func (a Article) TableName() string {
@@ -23,7 +24,7 @@ func (a Article) Create(db *gorm.DB) (*Article, error) {
 		return nil, err
 	}
 	// 缓存最新文章id
-	// redis.CacheLatestArticleID(a.ID)
+	redis.CacheLatestArticleID(a.ID)
 
 	return &a, nil
 }
@@ -80,13 +81,13 @@ type ArticleRow struct {
 	TagName       string
 	ArticleTitle  string
 	ArticleDesc   string
-	CoverImageUrl string
+	CoverImageKey string
 	Content       string
 }
 
 // 根据标签id获取文章列表
 func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int) ([]*ArticleRow, error) {
-	fields := []string{"ar.id AS article_id", "ar.title AS article_title", "ar.desc AS article_desc", "ar.cover_image_url", "ar.content"}
+	fields := []string{"ar.id AS article_id", "ar.title AS article_title", "ar.desc AS article_desc", "ar.cover_image_key", "ar.content"}
 	fields = append(fields, []string{"t.id AS tag_id", "t.name AS tag_name"}...)
 	query := db.Select(fields).Table(Article{}.TableName()+" AS ar").
 		Joins("LEFT JOIN `"+ArticleTag{}.TableName()+"` AS at ON ar.id = at.article_id").
@@ -108,10 +109,9 @@ func (a Article) ListByTagID(db *gorm.DB, tagID uint32, pageOffset, pageSize int
 	var articles []*ArticleRow
 	for rows.Next() {
 		r := &ArticleRow{}
-		if err := rows.Scan(&r.ArticleID, &r.ArticleTitle, &r.ArticleDesc, &r.CoverImageUrl, &r.Content, &r.TagID, &r.TagName); err != nil {
+		if err := rows.Scan(&r.ArticleID, &r.ArticleTitle, &r.ArticleDesc, &r.CoverImageKey, &r.Content, &r.TagID, &r.TagName); err != nil {
 			return nil, err
 		}
-
 		articles = append(articles, r)
 	}
 

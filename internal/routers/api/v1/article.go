@@ -2,6 +2,7 @@ package v1
 
 import (
 	"fmt"
+	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -145,27 +146,48 @@ func (a Article) Create(c *gin.Context) {
 // @Success 200 {object} Article "文章更新成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Router /api/v1/articles/{id} [put]
-// func (a Article) Update(c *gin.Context) {
-// 	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
-// 	response := app.NewResponse(c)
-// 	valid, errs := app.BindAndValid(c, &param)
-// 	if !valid {
-// 		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
-// 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
-// 		return
-// 	}
+func (a Article) Update(c *gin.Context) {
+	param := service.UpdateArticleRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
 
-// 	svc := service.New(c.Request.Context())
-// 	err := svc.UpdateArticle(&param)
-// 	if err != nil {
-// 		global.Logger.Errorf(c, "svc.UpdateArticle err: %v", err)
-// 		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
-// 		return
-// 	}
+	// 处理文件上传（如果有）
+	file, header, err := c.Request.FormFile("cover_image_url")
+	if err == nil {
+		// 文件已上传
+		defer file.Close()
 
-// 	response.ToResponse(gin.H{})
-// 	return
-// }
+		fileType := filepath.Ext(header.Filename)
+		if fileType != ".jpg" && fileType != ".png" {
+			response.ToErrorResponse(errcode.InvalidParams.WithDetails("file type not allowed"))
+			return
+		}
+
+		// 设置上传的文件到参数中
+		param.CoverImageUrl = header
+	} else if err != http.ErrMissingFile {
+		// 发生了除"没有文件"之外的错误
+		global.Logger.Errorf(c, "Error getting form file: %v", err)
+		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
+		return
+	}
+
+	svc := service.New(c.Request.Context())
+	err = svc.UpdateArticle(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.UpdateArticle err: %v", err)
+		response.ToErrorResponse(errcode.ErrorUpdateArticleFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
+}
 
 // @Summary 删除文章
 // @Produce json
@@ -201,15 +223,15 @@ func (a Article) Delete(c *gin.Context) {
 // @Success 200 {array} Article "热门文章列表"
 // @Failure 500 {object} errcode.Error "内部错误"
 // // @Router /api/v1/articles/hot [get]
-// func (a Article) GetHotArticles(c *gin.Context) {
-// 	response := app.NewResponse(c)
-// 	svc := service.New(c.Request.Context())
-// 	articles, err := svc.GetHotArticles()
-// 	if err != nil {
-// 		global.Logger.Errorf(c, "svc.GetHotArticles err: %v", err)
-// 		response.ToErrorResponse(errcode.ErrorGetHotArticlesFail)
-// 		return
-// 	}
+func (a Article) GetHotArticles(c *gin.Context) {
+	response := app.NewResponse(c)
+	svc := service.New(c.Request.Context())
+	articles, err := svc.GetHotArticles()
+	if err != nil {
+		global.Logger.Errorf(c, "svc.GetHotArticles err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetHotArticlesFail)
+		return
+	}
 
-// 	response.ToResponse(articles)
-// }
+	response.ToResponse(articles)
+}

@@ -7,9 +7,9 @@ import (
 
 var MinioClient *minio.Client
 
-// PutObjectOptions 别名
 type PutObjectOptions = minio.PutObjectOptions
 type MakeBucketOptions = minio.MakeBucketOptions
+type RemoveObjectOptions = minio.RemoveObjectOptions
 
 func NewMinioClient(endpoint, accessKeyID, secretAccessKey string, useSSL bool) error {
 	var err error

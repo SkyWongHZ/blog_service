@@ -41,11 +41,11 @@ func NewRouter() *gin.Engine {
 
 		apiv1.POST("/articles", article.Create)
 		apiv1.DELETE("/articles/:id", article.Delete)
-		// apiv1.PUT("/articles/:id", article.Update)
+		apiv1.PUT("/articles/:id", article.Update)
 		// apiv1.PATCH("/articles/:id/state", article.Update)
 		apiv1.GET("/articles/:id", article.Get)
 		apiv1.GET("/articles", article.List)
-		// apiv1.GET("/articles/hot", article.GetHotArticles)
+		apiv1.GET("/articles/hot", article.GetHotArticles)
 
 		apiv1.GET("/user", user.List)
 		apiv1.POST("/user", user.Create)
