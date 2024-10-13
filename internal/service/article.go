@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/go-programming-tour-book/blog-service/global"
 	"github.com/go-programming-tour-book/blog-service/internal/dao"
 	"github.com/go-programming-tour-book/blog-service/internal/model"
 	"github.com/go-programming-tour-book/blog-service/pkg/app"
@@ -78,8 +80,11 @@ func (svc *Service) GetArticle(param *ArticleRequest) (*Article, error) {
 		return nil, err
 	}
 	fmt.Println("article.CoverImageKey", article.CoverImageKey)
-	// 生成封面图片URL
+	// 使用minio生成封面图片URL
 	coverImageURL, err := svc.GenerateImageURL(article.CoverImageKey)
+
+	// oss
+	// coverImageURL, err := svc.GenerateOSSImageURL(article.CoverImageKey)
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +122,28 @@ func (svc *Service) GenerateImageURL(imageKey string) (string, error) {
 	return cleanURL, nil
 }
 
+// oss生成url
+func (svc *Service) GenerateOSSImageURL(imageKey string) (string, error) {
+	if imageKey == "" {
+		return "", errors.New("image key is empty")
+	}
+
+	// 假设我们已经在全局变量中设置了OSSClient
+	client := global.OSSClient
+	bucket, err := client.Bucket(global.OSSSetting.BucketName)
+	if err != nil {
+		return "", fmt.Errorf("failed to get bucket: %w", err)
+	}
+
+	// 生成签名URL，有效期为1小时
+	signedURL, err := bucket.SignURL(imageKey, oss.HTTPGet, 3600)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate signed URL: %w", err)
+	}
+
+	return signedURL, nil
+}
+
 func (svc *Service) GetArticleList(param *ArticleListRequest, pager *app.Pager) ([]*Article, int, error) {
 	var tagID uint32
 	if param.TagID != nil {
@@ -152,7 +179,7 @@ func (svc *Service) GetArticleList(param *ArticleListRequest, pager *app.Pager) 
 }
 
 func (svc *Service) CreateArticle(param *CreateArticleRequest) error {
-	// 处理文件上传
+	// minio处理文件上传
 	coverImageKey := ""
 	if param.CoverImageUrl != nil {
 		fmt.Printf("Processing cover image: %s", param.CoverImageUrl.Filename)
@@ -179,6 +206,30 @@ func (svc *Service) CreateArticle(param *CreateArticleRequest) error {
 
 		coverImageKey = objectName
 	}
+
+	// 阿里云oss处理文件上传
+	// coverImageKey := ""
+	// if param.CoverImageUrl != nil {
+	// 	file, err := param.CoverImageUrl.Open()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	defer file.Close()
+
+	// 	objectKey := fmt.Sprintf("cover_images/%d%s", time.Now().UnixNano(), filepath.Ext(param.CoverImageUrl.Filename))
+
+	// 	bucket, err := global.OSSClient.Bucket(global.OSSSetting.BucketName)
+	// 	if err != nil {
+	// 		fmt.Printf("Failed to get bucket: %v", err)
+	// 		return err
+	// 	}
+
+	// 	err = bucket.PutObject(objectKey, file)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	coverImageKey = objectKey
+	// }
 
 	article, err := svc.dao.CreateArticle(&dao.Article{
 		Title:         param.Title,

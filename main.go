@@ -109,6 +109,10 @@ func setupSetting() error {
 	if err != nil {
 		return err
 	}
+	err = setting.ReadSection("OSS", &global.OSSSetting)
+	if err != nil {
+		return err
+	}
 	global.JWTSetting.Expire *= time.Second
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
@@ -172,7 +176,7 @@ func setupOSS() error {
 	}
 
 	// 验证 bucket 是否存在并可访问
-	_, err = ossClient.Bucket(viper.GetString("OSS.BucketName"))
+	_, err = ossClient.Bucket(global.OSSSetting.BucketName)
 	if err != nil {
 		return fmt.Errorf("failed to get OSS bucket: %w", err)
 	}
